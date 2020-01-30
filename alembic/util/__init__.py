@@ -19,9 +19,12 @@ from .messaging import warn  # noqa
 from .messaging import write_outstream  # noqa
 from .pyfiles import coerce_resource_to_filename  # noqa
 from .pyfiles import edit  # noqa
+from .pyfiles import join_resources  # noqa
 from .pyfiles import load_python_file  # noqa
 from .pyfiles import pyc_file_from_path  # noqa
+from .pyfiles import resources  # noqa
 from .pyfiles import template_to_file  # noqa
+from .pyfiles import write_resource  # noqa
 from .sqla_compat import sqla_110  # noqa
 from .sqla_compat import sqla_1115  # noqa
 from .sqla_compat import sqla_120  # noqa

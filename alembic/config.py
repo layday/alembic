@@ -203,15 +203,6 @@ class Config(object):
             file_config.add_section(self.config_ini_section)
         return file_config
 
-    def get_template_directory(self):
-        """Return the directory where Alembic setup templates are found.
-
-        This method is used by the alembic ``init`` and ``list_templates``
-        commands.
-
-        """
-        return os.path.join(package_dir, "templates")
-
     def get_section(self, name, default=None):
         """Return all the configuration options from a given .ini file section
         as a dictionary.

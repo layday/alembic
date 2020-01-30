@@ -8,6 +8,7 @@ py2k = sys.version_info.major < 3
 py3k = sys.version_info.major >= 3
 py35 = sys.version_info >= (3, 5)
 py36 = sys.version_info >= (3, 6)
+py37 = sys.version_info >= (3, 7)
 
 
 ArgSpec = collections.namedtuple(
@@ -196,6 +197,12 @@ elif py3k:
         ).load_module(module_id)
         del sys.modules[module_id]
         return module
+
+
+if py37:
+    from importlib import resources
+else:
+    import importlib_resources as resources
 
 
 if py3k:

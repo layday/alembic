@@ -10,11 +10,12 @@ from .compat import has_pep3147
 from .compat import load_module_py
 from .compat import load_module_pyc
 from .compat import py35
+from .compat import resources
 from .exc import CommandError
 
 
-def template_to_file(template_file, dest, output_encoding, **kw):
-    template = Template(filename=template_file)
+def template_to_file(template_text, dest, output_encoding, **kw):
+    template = Template(text=template_text)
     try:
         output = template.render_unicode(**kw).encode(output_encoding)
     except:
@@ -105,3 +106,14 @@ def load_python_file(dir_, filename):
     elif ext in (".pyc", ".pyo"):
         module = load_module_pyc(module_id, path)
     return module
+
+
+def join_resources(*resources):
+    """Construct import paths for use in the resource API."""
+    return '.'.join(getattr(r, '__name__', r) for r in resources)
+
+
+def write_resource(package, resource, dest):
+    """Write a package resource on disk."""
+    with open(dest, "wb") as f:
+        f.write(resources.read_binary(package, resource))

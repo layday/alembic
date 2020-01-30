@@ -1,6 +1,7 @@
 import os
 
 from . import autogenerate as autogen
+from . import templates
 from . import util
 from .runtime.environment import EnvironmentContext
 from .script import ScriptDirectory
@@ -14,12 +15,14 @@ def list_templates(config):
     """
 
     config.print_stdout("Available templates:\n")
-    for tempname in os.listdir(config.get_template_directory()):
-        with open(
-            os.path.join(config.get_template_directory(), tempname, "README")
+    for template in util.resources.contents(templates):
+        if template.startswith('__'):
+            continue
+        with util.resources.open_text(
+            util.join_resources(templates, template), "README"
         ) as readme:
             synopsis = next(readme)
-        config.print_stdout("%s - %s", tempname, synopsis)
+        config.print_stdout("%s - %s", template, synopsis)
 
     config.print_stdout("\nTemplates are used via the 'init' command, e.g.:")
     config.print_stdout("\n  alembic init --template generic ./scripts")
@@ -48,8 +51,9 @@ def init(config, directory, template="generic", package=False):
             "Directory %s already exists and is not empty" % directory
         )
 
-    template_dir = os.path.join(config.get_template_directory(), template)
-    if not os.access(template_dir, os.F_OK):
+    if template not in {
+        r for r in util.resources.contents(templates) if not r.startswith('__')
+    }:
         raise util.CommandError("No such template %r" % template)
 
     if not os.access(directory, os.F_OK):
@@ -68,19 +72,23 @@ def init(config, directory, template="generic", package=False):
 
     script = ScriptDirectory(directory)
 
-    for file_ in os.listdir(template_dir):
-        file_path = os.path.join(template_dir, file_)
-        if file_ == "alembic.ini.mako":
+    template_pkg = util.join_resources(templates, template)
+    for file_ in util.resources.contents(template_pkg):
+        if file_.startswith('__'):
+            continue
+        elif file_ == "alembic.ini.mako":
             config_file = os.path.abspath(config.config_file_name)
             if os.access(config_file, os.F_OK):
                 util.msg("File %s already exists, skipping" % config_file)
             else:
                 script._generate_template(
-                    file_path, config_file, script_location=directory
+                    util.resources.read_binary(template_pkg, file_),
+                    config_file,
+                    script_location=directory
                 )
-        elif os.path.isfile(file_path):
+        elif util.resources.is_resource(template_pkg, file_):
             output_file = os.path.join(directory, file_)
-            script._copy_file(file_path, output_file)
+            script._write_resource(template_pkg, file_, output_file)
 
     if package:
         for path in [

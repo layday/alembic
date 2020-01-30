@@ -25,6 +25,10 @@ requires = [
     "python-dateutil",
 ]
 
+extras = {
+    ':python_version < "3.7"': 'importlib-resources~=1.0',
+}
+
 
 class UseTox(TestCommand):
     RED = 31
@@ -75,5 +79,6 @@ setup(
     cmdclass={"test": UseTox},
     zip_safe=False,
     install_requires=requires,
+    extras_require=extras,
     entry_points={"console_scripts": ["alembic = alembic.config:main"]},
 )

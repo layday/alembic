@@ -1,3 +1,4 @@
+from alembic.util.pyfiles import write_resource
 from contextlib import contextmanager
 import datetime
 import os
@@ -492,19 +493,23 @@ class ScriptDirectory(object):
     def env_py_location(self):
         return os.path.abspath(os.path.join(self.dir, "env.py"))
 
-    def _generate_template(self, src, dest, **kw):
+    def _generate_template(self, text, dest, **kw):
         util.status(
             "Generating %s" % os.path.abspath(dest),
             util.template_to_file,
-            src,
+            text,
             dest,
             self.output_encoding,
             **kw
         )
 
-    def _copy_file(self, src, dest):
+    def _write_resource(self, package, resource, dest):
         util.status(
-            "Generating %s" % os.path.abspath(dest), shutil.copy, src, dest
+            "Generating %s" % os.path.abspath(dest),
+            util.write_resource,
+            package,
+            resource,
+            dest
         )
 
     def _ensure_directory(self, path):
